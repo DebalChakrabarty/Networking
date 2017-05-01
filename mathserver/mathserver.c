@@ -41,33 +41,37 @@ int main()
 			for(i=0;i<=strlen(buffer) -1 ;i++)
 			{
 				tmp = (int)buffer[i];
-				if(tmp>=48 && tmp <=57){
-					
+				if(tmp>=48 && tmp <=57)
+				{
 					tmp= tmp - 48;
 					nol = nol * 10 + tmp;
-					}
-				if(buffer[i] == '+'){
-				a = nol;
-				nol=0;
-				sym = 1;
+				}
+				if(buffer[i] == '+')
+				{
+					a = nol;
+					nol=0;
+					sym = 1;
 				
 				}
-				if(buffer[i] == '-'){
-				a = nol;
-				nol=0;
-				sym = 2;
+				if(buffer[i] == '-')
+				{
+					a = nol;
+					nol=0;
+					sym = 2;
 				
 				}
-				if(buffer[i] == '*'){
-				a = nol;
-				nol=0;
-				sym = 3;
+				if(buffer[i] == '*')
+				{
+					a = nol;
+					nol=0;
+					sym = 3;
 				
 				}
-				if(buffer[i] == '/'){
-				a = nol;
-				nol=0;
-				sym = 4;
+				if(buffer[i] == '/')
+				{
+					a = nol;
+					nol=0;
+					sym = 4;
 				
 				}
 			}
@@ -98,9 +102,8 @@ int main()
 			n = write(newsockfd,msg, 255);
 	}	
 	
-		
-	
 	close(newsockfd);
+	
 	close(sockfd);
     return 0; 
 }
