@@ -1,54 +1,49 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/types.h> 
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <string.h>
-#include <arpa/inet.h>
-#include <time.h>
-
-int main(int argc, char *argv[])
+#include<stdio.h>
+#include<string.h>
+#include<stdlib.h>
+#include<strings.h>
+#include<sys/types.h> 
+#include<netinet/in.h> 
+#include<sys/socket.h>
+#include<unistd.h>
+#include<sys/socket.h>
+#include<arpa/inet.h>
+int main(int argc,char *argv[])
 {
-    int sockfd, portno, n;
-    struct sockaddr_in serv_addr;
-
-    char buffer[256],msg[256];
-
-    if (argc < 3) {
-        fprintf(stderr,"usage %s hostname port\n", argv[0]);
-        exit(0);
-    }
-    portno = atoi(argv[2]);
-    sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sockfd < 0) 
-    {
-        perror("ERROR opening socket");
-        exit(1);
-    }
-    
-
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_addr.s_addr = inet_addr(argv[1]);
-    serv_addr.sin_port = htons(portno);
-
-    if (connect(sockfd,(const struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0) 
-    {
-         perror("ERROR connecting");
-         exit(1);
-    }	
+	int sockfd,newsockfd,i,j,k,l;
+	char msg[100];
+	struct sockaddr_in serv_addr;
+	sockfd=socket(AF_INET,SOCK_STREAM,0);
+	if(sockfd<0)
+	{
+		printf("socket creation failed\n");
+		exit(0);
+	}
+	else
+		printf("Socket successfully created\n");
+	bzero(&serv_addr,sizeof(serv_addr));
+	serv_addr.sin_family=AF_INET;
+	serv_addr.sin_addr.s_addr=inet_addr("127.0.0.1");
+	serv_addr.sin_port=htons(atoi(argv[1]));
+	if(connect(sockfd,(struct sockaddr *)&serv_addr,sizeof(serv_addr))<0)
+	{
+		printf("error on connecting\n");
+		exit(0);
+	}
+	else
+		printf("connected to the server\n");
 	while(1)
 	{
-	    printf("Please enter the expression: ");
-	    bzero(buffer,256);
-	    fgets(buffer,255,stdin);
-	    n = write(sockfd,buffer,strlen(buffer));
-	    
-	    bzero(msg,256);
-	    n = read(sockfd,msg,255);
-	    
-	    printf("Here is the answer: %s\n",msg);
+		memset(msg,0,100);
+		printf("Enter the string to be sent to the: \n");
+		fgets(msg,100,stdin);
+		write(sockfd,msg,100);
+		memset(msg,0,100);
+		read(sockfd,msg,100);
+		printf("the message from server : %s \n");
 	}
 	close(sockfd);
-    return 0;
 }
-//./a.out 127.0.0.1 5016
+		
+	
+	
