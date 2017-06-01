@@ -1,79 +1,47 @@
 #include<stdio.h>
-#include<netinet/in.h>
-#include<sys/types.h>
-#include<sys/socket.h>
-#include<netdb.h>
-#include<stdlib.h>
 #include<string.h>
-#define MAX 80
-#define PORT 43454
-#define SA struct sockaddr
-void func(int sockfd)
+#include<stdlib.h>
+#include<strings.h>
+#include<sys/types.h> 
+#include<netinet/in.h> 
+int main(int argc,char *argv[])
 {
-  char buff[MAX];
-  int n;
-  for(;;)
-  {
-    bzero(buff,MAX);
-    read(sockfd,buff,sizeof(buff));
-    printf("From client: %s\t To client : ",buff);
-    bzero(buff,MAX);
-    n=0;
-    while((buff[n++]=getchar())!='\n');
-    write(sockfd,buff,sizeof(buff));
-    if(strncmp("exit",buff,4)==0)
-    {
-      printf("Server Exit...\n");
-      break;
-    }
-  }
+	int sockfd,newsockfd,i,j,k,clilen,portno;
+	struct sockaddr_in serv_addr,cli_addr;
+	char msg[100];
+	bzero((char *)&serv_addr,sizeof(serv_addr));
+	memset(msg,0,100);
+	portno=atoi(argv[1]);
+	sockfd = socket(AF_INET,SOCK_STREAM,0);
+	if(sockfd<0)
+	{
+		error("error opening socket\n");
+		exit(0);
+	}
+	serv_addr.sin_family=AF_INET;
+	serv_addr.sin_addr.s_addr=INADDR_ANY;
+	serv_addr.sin_port=htons(portno);
+	if(bind(sockfd,(struct sockaddr *)&serv_addr,sizeof(serv_addr))<0)
+	{
+		error("error on binding socket\n");
+		exit(0);
+	}
+	listen(sockfd,5);
+	clilen=sizeof(cli_addr);
+	newsockfd=accept(sockfd,(struct sockaddr *)&cli_addr,&clilen);
+	if(newsockfd<0)
+		printf("error on accept\n");
+	while(1)
+	{
+		memset(msg,0,100);
+		read(newsockfd,msg,100);
+		printf("from client: %s\n");
+		memset(msg,0,100);
+		printf("Enter the message to send to client:\n");
+		fgets(msg,100,stdin);
+		write(newsockfd,msg,100);
+	}
+	close(sockfd);
 }
-int main()
-{
-  int sockfd,connfd,len;
-  struct sockaddr_in servaddr,cli;
-  sockfd=socket(AF_INET,SOCK_STREAM,0);
-  if(sockfd==-1)
-  {
-    printf("socket creation failed...\n");
-    exit(0);
-  }
-  else
-  printf("Socket successfully created..\n");
-  bzero(&servaddr,sizeof(servaddr));
-  
-  servaddr.sin_family=AF_INET;
-  servaddr.sin_addr.s_addr=htonl(INADDR_ANY);
-  servaddr.sin_port=htons(PORT);
-  
-  if((bind(sockfd,(SA*)&servaddr, sizeof(servaddr)))!=0)
-  {
-    printf("socket bind failed...\n");
-    exit(0);
-  }
-  else
-  printf("Socket successfully binded..\n");
-  
-  if((listen(sockfd,5))!=0)
-  {
-    printf("Listen failed...\n");
-    exit(0);
-  }
-  else
-  printf("Server listening..\n");
-  
-  len=sizeof(cli);
-  connfd=accept(sockfd,(SA *)&cli,&len);
-  
-  if(connfd<0)
-  {
-    printf("server acccept failed...\n");
-    exit(0);
-  }
-  else
-    printf("server acccept the client...\n");
-  
-  func(connfd);
-  
-  close(sockfd);
-}
+	
+	
